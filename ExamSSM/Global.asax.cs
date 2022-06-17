@@ -12,6 +12,7 @@ namespace ExamSSM
 	{
 		protected void Application_Start()
 		{
+			//prueba
 			AreaRegistration.RegisterAllAreas();
 			FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
 			RouteConfig.RegisterRoutes(RouteTable.Routes);
