@@ -1,0 +1,212 @@
+﻿@model IEnumerable<ExamSSM.Models.ListaPedidosModel>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="~/funciones.js"></script>
+    <!-- jQuery -->
+</head>
+
+<body>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    #
+                </th>
+                <th>
+                    Número Factura
+                </th>
+                <th>
+                    Fecha
+                </th>
+                <th>
+                    Nombre
+                </th>
+                <th>
+                    Total
+                </th>
+                <th>
+                    Opción
+                </th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.nId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.nInvoice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.dFecha)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.cName)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.nTotal)
+                    </td>
+
+                    <td>
+                        @*<a id="alumno" data-target="#modalAlumno" data-toggle="modal" data-id="454365346" href="#" class="sepV_a" title="Agregar alumnos"><i class="icon-eye-open"></i>abri</a>*@
+                        <a id="alumno"
+                           data-target="#modalAlumno"
+                           data-toggle="modal"
+                           data-id="@Html.DisplayFor(modelItem => item.nInvoice)"
+                           href="#"
+                           class="sepV_a"
+                           title="Agregar alumnos"><i class="icon-eye-open"></i> Detalle</a>
+                        @*<a>@Html.ActionLink("Edit", "Edit", "OrderDetails", new { id = item.nInvoice })</a> |*@
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</body>
+</html>
+
+
+
+<!-- Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalAlumno" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Details</h4>
+                </div>
+                <div class="modal-body" style="overflow:auto;margin-left:5px;margin-right:5px;">
+                    <div>
+                        <table class="table table-striped" cellspacing="3" cellpadding="3">
+                            <tr>
+                                <td>
+                                    <label>
+                                        Número Factura
+                                    </label>
+                                </td>
+                                <td>
+                                    <input type="number" name="InvoiceNumber" id="InvoiceNumber" value="" />
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>Fecha</label>
+                                </td>
+                                <td>
+                                    <input type="text" name="Date" id="Date" value="" />
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>Nombre Cliente</label>
+                                </td>
+                                <td>
+                                    <input type="text" name="CustomerName" id="CustomerName" value="" />
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>Notas</label>
+                                </td>
+                                <td>
+                                    <input type="text" name="Notes" id="Notes" value="" />
+                                </td>
+
+                            </tr>
+
+
+                        </table>
+                    </div>
+                    <div>
+                        <table id="TablaDetCartera" class="table table-bordered" style="width:auto;height:auto">
+                            <thead style="background-color:lightgray;color:black">
+                                <tr>
+                                    <th style="text-align:center;width:20px">ID Producto</th>
+                                    <th style="text-align:left;width:180px;">Descripción</th>
+                                    <th style="text-align:center;width:100px;">Cantidad</th>
+                                    <th style="text-align:center;width:100px;">Precio</th>
+                                    <th style="text-align:center;width:100px;">Total</th>
+
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @section scripts{
+
+        <script>
+    $(document).ready(function (e) {
+        $('#modalAlumno').on('show.bs.modal', function (e) {
+            var id = $(e.relatedTarget).data().id;
+
+            var url = "@Url.Action("ObtenerDetalles", "ListaPedidos")";
+            var urlDetalleProducto="@Url.Action("ObtenerDetalleProducto", "ListaPedidos")";
+
+            var cantidad = id
+            var data = { id: cantidad };
+            $.post(url, data).done(function (data) {
+
+                //CONVERTIRMOS LA FECHA
+                var fecha = new Date(parseInt(data[0].dFecha.match(/\d+/)[0]));
+                var fechaCompleta= fecha.getMonth() + 1 + '/' + fecha.getDate() + '/' + fecha.getFullYear();;
+
+                $(e.currentTarget).find('#InvoiceNumber').val(data[0].nInvoice);
+                $(e.currentTarget).find('#Date').val(fechaCompleta);
+                $(e.currentTarget).find('#CustomerName').val(data[0].cName);
+                $(e.currentTarget).find('#Notes').val(data[0].cNotes);
+
+            })
+            //OBTENEMOS LOS REGISTROS DISGREGADOS
+            $("#TablaDetCartera >tbody").empty();
+            $.post(urlDetalleProducto, data).done(function (data) {
+
+       
+                var FilasTabla = "";
+
+                $.each(data, function (i, item) {
+                    FilasTabla += '<tr style="font-size:12px">';
+                    FilasTabla += '<td style ="text-align:center;font-weight:bold">' + item.nProductId + '</td>';
+                    FilasTabla += '<td style ="text-align:left;font-weight:bold">' + item.nDescripcion + '</td>';
+                    FilasTabla += '<td style ="text-align:right;font-weight:bold">' + item.nCantidad + '</td>';
+                    FilasTabla += '<td style ="text-align:right;font-weight:bold">' + item.nPrecio + '</td>';
+                    FilasTabla += '<td style ="text-align:right;font-weight:bold">' + (item.nCantidad * item.nPrecio).toFixed(2) + '</td>';
+                    FilasTabla += '</tr>';
+                });
+                $("#TablaDetCartera >tbody").append(FilasTabla);
+
+            })
+
+
+
+        });
+    });
+
+        </script>
+    }
